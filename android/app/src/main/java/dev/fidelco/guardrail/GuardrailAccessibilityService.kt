@@ -23,7 +23,7 @@ class GuardrailAccessibilityService : AccessibilityService() {
     private val limitCheck = object : Runnable {
         override fun run() {
             val pkg = foregroundPackage ?: return
-            if (pkg !in Blocked.blockedApps) return
+            if (!shouldGatePackage(pkg, Blocked.blockedApps, Blocked.isLockdown(prefs))) return
             val reason = if (bypassed(pkg)) null else blockReason(pkg)
             if (reason != null) showOverlay(pkg, reason) else dismissOverlay()
             limitHandler.postDelayed(this, LIMIT_RECHECK_MS)
@@ -88,17 +88,16 @@ class GuardrailAccessibilityService : AccessibilityService() {
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             foregroundPackage = pkg
             limitHandler.removeCallbacks(limitCheck)
-            if (pkg in Blocked.blockedApps) {
+            if (shouldGatePackage(pkg, Blocked.blockedApps, Blocked.isLockdown(prefs))) {
                 limitHandler.postDelayed(limitCheck, LIMIT_RECHECK_MS)
             }
         } else if (pkg != foregroundPackage) return
 
-        if (pkg !in Blocked.blockedApps || bypassed(pkg)) {
-            dismissOverlay()
-            return
-        }
         val reason = blockReason(pkg)
-        if (reason == null) {
+        if (reason == null ||
+            !shouldGatePackage(pkg, Blocked.blockedApps, reason == REASON_LOCKDOWN) ||
+            bypassed(pkg)
+        ) {
             dismissOverlay()
             return
         }
