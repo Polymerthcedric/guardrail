@@ -1,0 +1,6 @@
+{
+  "IncognitoModeAvailability": 1,
+  "BrowserGuestModeEnabled": false,
+  "DnsOverHttpsMode": "off",
+  "BuiltInDnsClientEnabled": false
+}

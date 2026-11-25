@@ -1,0 +1,10 @@
+{
+  "policies": {
+    "DisablePrivateBrowsing": true,
+    "OfferToSaveLogins": false,
+    "NetworkPrediction": false,
+    "DNSOverHTTPS": {
+      "Enabled": false
+    }
+  }
+}

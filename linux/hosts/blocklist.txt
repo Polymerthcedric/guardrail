@@ -1,0 +1,39 @@
+# One domain per line. Subdomains are NOT implied — add them explicitly
+# (e.g. both youtube.com and www.youtube.com). Sinkholed to 0.0.0.0.
+# youtube kept available for now — uncomment to block again
+# youtube.com
+# www.youtube.com
+# m.youtube.com
+# www.youtube-nocookie.com
+# youtu.be
+pornhub.com
+www.pornhub.com
+xvideos.com
+www.xvideos.com
+xnxx.com
+www.xnxx.com
+facebook.com
+www.facebook.com
+m.facebook.com
+instagram.com
+www.instagram.com
+tiktok.com
+www.tiktok.com
+m.tiktok.com
+reddit.com
+www.reddit.com
+old.reddit.com
+twitter.com
+www.twitter.com
+x.com
+www.x.com
+netflix.com
+www.netflix.com
+twitch.tv
+www.twitch.tv
+primevideo.com
+www.primevideo.com
+9gag.com
+www.9gag.com
+buzzfeed.com
+www.buzzfeed.com

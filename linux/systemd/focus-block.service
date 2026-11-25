@@ -1,0 +1,10 @@
+[Unit]
+Description=Guardrail focus block: enable hosts sinkhole + nftables fence
+Wants=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/focus-guardrail on
+
+[Install]
+WantedBy=multi-user.target

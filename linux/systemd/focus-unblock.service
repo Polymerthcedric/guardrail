@@ -1,0 +1,9 @@
+[Unit]
+Description=Guardrail focus block: disable hosts sinkhole + nftables fence
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/focus-guardrail off
+
+[Install]
+WantedBy=multi-user.target

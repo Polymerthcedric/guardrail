@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    android:settingsActivity="dev.fidelco.guardrail.MainActivity"
+    android:packageNames="com.google.android.youtube,com.zhiliaoapp.musically,com.instagram.android,com.facebook.katana,com.twitter.android,com.reddit.frontpage,com.netflix.mediaclient,tv.twitch.android.app,com.snapchat.android,com.pinterest,com.android.chrome" />
