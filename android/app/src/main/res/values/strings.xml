@@ -2,5 +2,28 @@
 <resources>
     <string name="app_name">Guardrail</string>
     <string name="accessibility_service_description">Detects when a restricted app opens and shows Guardrail\'s block screen. It inspects Chrome\'s visible interface to detect Incognito. Screen contents stay on this device.</string>
+    <string name="accessibility_disclosure_title">Allow app-gating access?</string>
+    <string name="accessibility_disclosure_message">To apply your chosen schedules, Guardrail\'s Accessibility service observes which app is open. It inspects visible Chrome content only to detect Incognito mode. This information is processed on your device and is not uploaded or shared.</string>
+    <string name="continue_to_settings">Continue to Settings</string>
+    <string name="not_now">Not now</string>
     <string name="vpn_channel_name">Guardrail DNS filter</string>
+    <string name="focus_active">Restrictions active</string>
+    <string name="focus_inactive">No scheduled restrictions</string>
+    <string name="focus_schedules_below">Per-app schedules are shown below</string>
+    <plurals name="restricted_apps_active">
+        <item quantity="one">%1$d app restricted by schedule</item>
+        <item quantity="other">%1$d apps restricted by schedule</item>
+    </plurals>
+    <plurals name="selected_apps_count">
+        <item quantity="one">%1$d app selected</item>
+        <item quantity="other">%1$d apps selected</item>
+    </plurals>
+    <string name="gate_enabled">App gate access is on</string>
+    <string name="gate_enable">Enable app-gating access</string>
+    <string name="gate_enabled_summary">Enabled in Android Settings · tap to review</string>
+    <string name="gate_disabled_summary">Required for app schedules · activity details stay on this device</string>
+    <string name="notifications_enabled">Focus notifications are on</string>
+    <string name="notifications_enable">Enable focus notifications</string>
+    <string name="notifications_enabled_summary">Optional status updates for active schedules</string>
+    <string name="notifications_disabled_summary">Optional · show when scheduled restrictions are active</string>
 </resources>

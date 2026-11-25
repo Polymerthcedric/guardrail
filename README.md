@@ -1,6 +1,9 @@
-# guardrail
+# Guardrail
 
-Self-hosted deep-work fence for the ThinkPad T440 (Arch) and a Realme phone.
+Local-first focus-time controls for Linux desktops and Android phones. The Android
+app declares Android 8.0+ (API 26) support and is not tied to Realme, but it has
+not been verified across every Android version or device manufacturer. Accessibility,
+VPN, and background-service behavior can vary by device.
 
 Blocks the distracting pile (YouTube, video, social, news) between 07:00 and 19:00,
 with the honest constraint stated up front: **any device you use daily can be reset or
@@ -38,10 +41,12 @@ bypassing annoying, not impossible.
 | Lock | Device *Owner* (not plain admin) can block uninstall + disable auto time | factory reset beats it |
 | Base | Digital Wellbeing app timers for the apps the above would miss | same caveat |
 
-The Android app is a ~4-part skeleton (a11y + vpn + device-admin receiver +
-focus overlay/UI). On realme UI T phones (e.g. realme Note 50) device-owner
-provisioning is often rejected; see `android/README.md` before trying
-`dpm set-device-owner`.
+The Android app provides app schedules, optional DNS filtering, and recovery
+controls. Accessibility access is user-enabled; Device Owner mode is optional,
+advanced, and requires provisioning that can involve a factory reset. See
+[`android/README.md`](android/README.md) and
+[`android/COMPATIBILITY.md`](android/COMPATIBILITY.md) for setup, verified-device
+notes, and distribution constraints.
 
 ## Quick start (laptop only)
 

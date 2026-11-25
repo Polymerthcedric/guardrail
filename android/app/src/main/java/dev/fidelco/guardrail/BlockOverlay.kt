@@ -44,6 +44,7 @@ class BlockOverlay(private val service: AccessibilityService) {
                     ctx = service,
                     appIcon = appIcon(pkg),
                     reason = reason,
+                    windowDescription = Blocked.describeWindow(pkg, prefs),
                     lockdown = lockdown,
                     strict = strict,
                     left = left,

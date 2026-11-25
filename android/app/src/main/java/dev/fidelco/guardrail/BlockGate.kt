@@ -2,6 +2,16 @@ package dev.fidelco.guardrail
 
 internal fun shouldGatePackage(
     packageName: String,
-    blockedApps: Set<String>,
+    restrictedApps: Set<String>,
     lockdownActive: Boolean,
-): Boolean = lockdownActive || packageName in blockedApps
+    recoveryPackages: Set<String> = emptySet(),
+): Boolean {
+    if (packageName in recoveryPackages) return false
+    return lockdownActive || packageName in restrictedApps
+}
+
+internal fun packagesToObserve(
+    restrictedApps: Set<String>,
+    recoveryPackages: Set<String>,
+    browserPackages: Set<String>,
+): Set<String> = restrictedApps + recoveryPackages + browserPackages

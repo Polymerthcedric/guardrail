@@ -5,12 +5,13 @@ import android.os.SystemClock
 import android.util.Log
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.Locale
 
 object Blocked {
 
     private const val TAG = "Guardrail"
 
-    val blockedApps = setOf(
+    private val defaultRestrictedApps = setOf(
         "com.google.android.youtube",
         "com.zhiliaoapp.musically",
         "com.instagram.android",
@@ -22,6 +23,21 @@ object Blocked {
         "com.snapchat.android",
         "com.pinterest"
     )
+
+    const val KEY_RESTRICTED_APPS = "restricted_apps"
+
+    fun restrictedApps(prefs: SharedPreferences): Set<String> =
+        prefs.getStringSet(KEY_RESTRICTED_APPS, null)?.toSet() ?: defaultRestrictedApps
+
+    fun initializeRestrictedApps(prefs: SharedPreferences, installedPackages: Set<String>) {
+        if (!prefs.contains(KEY_RESTRICTED_APPS)) {
+            setRestrictedApps(prefs, defaultRestrictedApps.intersect(installedPackages))
+        }
+    }
+
+    fun setRestrictedApps(prefs: SharedPreferences, packages: Set<String>) {
+        prefs.edit().putStringSet(KEY_RESTRICTED_APPS, packages.toSet()).apply()
+    }
 
     val domains = setOf(
         "youtube.com", "m.youtube.com", "youtu.be",
@@ -148,7 +164,7 @@ object Blocked {
     }
 
     private fun hhmm(t: LocalTime): String =
-        String.format("%02d:%02d", t.hour, t.minute).replaceFirst(Regex("^0"), "")
+        String.format(Locale.getDefault(), "%02d:%02d", t.hour, t.minute).replaceFirst(Regex("^0"), "")
 
     private fun minutes(t: LocalTime): Int = t.hour * 60 + t.minute
 

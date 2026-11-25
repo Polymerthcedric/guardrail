@@ -31,6 +31,7 @@ class BlockedAppActivity : Activity() {
                 ctx = this,
                 appIcon = appIcon(pkg),
                 reason = reason,
+                windowDescription = Blocked.describeWindow(pkg, prefs),
                 lockdown = lockdown,
                 strict = strict,
                 left = left,

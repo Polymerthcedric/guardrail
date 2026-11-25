@@ -1,6 +1,12 @@
-# guardrail-android
+# Guardrail Android
 
-Kotlin AppCompat-less skeleton (four surfaces, each independently removable):
+Guardrail's Android app is designed for phones running Android 8.0 (API 26) or
+newer. It has no Realme-only dependency, but that minimum is a compatibility
+target, not a claim that every Android version or OEM has been tested. Accessibility
+and VPN access are user-controlled, and manufacturer battery policies may affect
+background reliability. See [Compatibility and distribution](COMPATIBILITY.md).
+
+## What it does
 
 1. `GuardrailAccessibilityService` — watches `TYPE_WINDOW_STATE_CHANGED` and puts
    a full-screen focus barrier in front of blocked packages. The barrier is a
@@ -9,8 +15,8 @@ Kotlin AppCompat-less skeleton (four surfaces, each independently removable):
    `startActivity()` from a service
    (logcat: `AOSP_SafeCenter ... START_ABORTED`), while accessibility overlay
    windows are exempt. It also kicks straight home if the user opens Guardrail's
-   own App Info / Settings page (the Force-Stop loophole). A
-   It rechecks the foreground restricted app every five seconds so schedule
+   own App Info / Settings page (the Force-Stop loophole). It rechecks the
+   foreground restricted app every five seconds so schedule
    boundaries, expired emergency unlocks, and daily limits take effect without
    waiting for another app switch. If a daily limit is configured while Usage
    Access is off, the app shows a setup-required barrier instead of treating
@@ -56,9 +62,8 @@ Kotlin AppCompat-less skeleton (four surfaces, each independently removable):
 ## Build
 
 ```sh
-# JDK 21 + Gradle 8.10.2 (path-carrying tools, not on PATH)
-JAVA_HOME=$(ls -d ~/.local/java/jdk-21*); export PATH="$JAVA_HOME/bin:$PATH"
-~/.local/share/gradle/gradle-8.10.2/bin/gradle :app:assembleDebug --no-daemon
+# Install JDK 21, then:
+./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
 
 adb install --no-streaming -r app/build/outputs/apk/debug/app-debug.apk
 ```
@@ -107,14 +112,14 @@ dump` (`null root node`). Disable the grant temporarily to dump the UI (the DNS
 toggle sits at ~`(581,585)` on the 720×1600 layout). The VPN service is not
 exported, so it cannot be started from the shell — toggle it in the UI.
 
-## Realme reality check
+## Device-specific testing notes
 
-Target device: **realme Note 50 (RMX3834)**. It ships with **realme UI T**
+The previously tested device was a **realme Note 50 (RMX3834)**. It ships with **realme UI T**
 (realme's lite UI for the Note line) on **Android 13**, later updated to
 **Android 15** — this unit reports `ro.build.version.release=15`,
 `ro.build.display.id=RMX3834export_15_H.07`, fingerprint
 `realme/RMX3834/RE5C9F:15/...`. Its settings app is `com.android.settings`.
-Consequently the ROM-specific behaviours described here (background
+These ROM-specific behaviors do not imply the same behavior on other devices:
 `startActivity()` aborts, `uiautomator` refusal while an a11y service is active,
 `RMX3834export_…` build strings) are realme UI T behaviours.
 
