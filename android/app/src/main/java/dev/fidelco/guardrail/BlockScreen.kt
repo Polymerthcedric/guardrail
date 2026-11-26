@@ -27,6 +27,7 @@ object BlockScreen {
         ctx: Context,
         appIcon: Drawable,
         reason: String,
+        windowDescription: String,
         lockdown: Boolean,
         strict: Boolean,
         left: Int,
@@ -72,8 +73,8 @@ object BlockScreen {
 
         val bodyText = when {
             lockdown ->
-                "The clock moved out of sync, so every app stays locked. " +
-                    "Restore the correct time, then clear the lockdown in Guardrail."
+                "The clock moved out of sync, so restricted apps stay locked. " +
+                    "Home, Settings, Phone, and Guardrail remain available so you can restore the time and recover."
             incognito ->
                 "Private tabs open a blank space with no filter. It stays off " +
                     "so browsing can't slip past the fence."
@@ -83,8 +84,7 @@ object BlockScreen {
             reason == GuardrailAccessibilityService.REASON_LIMIT ->
                 "You've reached today's limit for this app. It resets at midnight."
             else ->
-                "Restricted during your focus window " +
-                    "(${Blocked.START_HOUR}:00\u2013${Blocked.END_HOUR}:00)."
+                "Restricted during your focus window ($windowDescription)."
         }
         val body = ui.body(bodyText).apply {
             gravity = Gravity.CENTER

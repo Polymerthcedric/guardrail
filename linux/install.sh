@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SRC="/home/cedric/Work/guardrail/linux"
+SRC="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ETC="/etc/guardrail"
 
 sudo mkdir -p "$ETC"

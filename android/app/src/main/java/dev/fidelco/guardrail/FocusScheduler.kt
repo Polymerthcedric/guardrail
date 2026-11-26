@@ -22,7 +22,8 @@ object FocusScheduler {
         val next = nextTransition(ctx, now)
         if (next == null) am.cancel(alarm(ctx))
         else am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, millis(next), alarm(ctx))
-        val active = Blocked.blockedApps.any { Blocked.windowActive(it, ctx.getSharedPreferences(BootReceiver.PREFS, Context.MODE_PRIVATE), now.toLocalTime()) }
+        val prefs = ctx.getSharedPreferences(BootReceiver.PREFS, Context.MODE_PRIVATE)
+        val active = Blocked.restrictedApps(prefs).any { Blocked.windowActive(it, prefs, now.toLocalTime()) }
         if (active && gateActive(ctx)) show(ctx) else cancel(ctx)
     }
 
@@ -72,7 +73,7 @@ object FocusScheduler {
 
     private fun nextTransition(ctx: Context, now: LocalDateTime): LocalDateTime? {
         val prefs = ctx.getSharedPreferences(BootReceiver.PREFS, Context.MODE_PRIVATE)
-        return Blocked.blockedApps.flatMap { pkg ->
+        return Blocked.restrictedApps(prefs).flatMap { pkg ->
             Blocked.windowsFor(pkg, prefs).flatMap { window -> listOf(window.start, window.end) }
         }.distinct().map { minute ->
             val target = now.toLocalDate().atStartOfDay().plusMinutes(minute.toLong())

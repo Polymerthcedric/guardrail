@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Process
 import java.util.Calendar
+import java.util.Locale
 
 object Usage {
 
@@ -113,6 +114,6 @@ object Usage {
 
     fun mmss(ms: Long): String {
         val m = ms / 60_000
-        return if (m < 60) "${m}m" else "${m / 60}h ${String.format("%02d", m % 60)}m"
+        return if (m < 60) "${m}m" else "${m / 60}h ${String.format(Locale.getDefault(), "%02d", m % 60)}m"
     }
 }

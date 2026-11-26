@@ -1,6 +1,7 @@
 package dev.fidelco.guardrail
 
 import android.accessibilityservice.AccessibilityService
+import android.content.SharedPreferences
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -12,6 +13,11 @@ import java.time.LocalTime
 class GuardrailAccessibilityService : AccessibilityService() {
 
     private val prefs by lazy { getSharedPreferences("guardrail", MODE_PRIVATE) }
+    private var recoveryPackages = emptySet<String>()
+    private var settingsPackages = emptySet<String>()
+    private val selectedAppsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == Blocked.KEY_RESTRICTED_APPS) updateEventPackageFilter()
+    }
     private var overlay: BlockOverlay? = null
     private var lastIncognitoBlock = 0L
     private var lastIncognitoScan = 0L
@@ -23,7 +29,13 @@ class GuardrailAccessibilityService : AccessibilityService() {
     private val limitCheck = object : Runnable {
         override fun run() {
             val pkg = foregroundPackage ?: return
-            if (pkg !in Blocked.blockedApps) return
+            if (!shouldGatePackage(
+                    pkg,
+                    Blocked.restrictedApps(prefs),
+                    Blocked.isLockdown(prefs),
+                    recoveryPackages
+                )
+            ) return
             val reason = if (bypassed(pkg)) null else blockReason(pkg)
             if (reason != null) showOverlay(pkg, reason) else dismissOverlay()
             limitHandler.postDelayed(this, LIMIT_RECHECK_MS)
@@ -33,16 +45,31 @@ class GuardrailAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
+        prefs.registerOnSharedPreferenceChangeListener(selectedAppsListener)
+        updateEventPackageFilter()
         Log.i(TAG, "connected")
     }
 
     override fun onDestroy() {
+        prefs.unregisterOnSharedPreferenceChangeListener(selectedAppsListener)
         limitHandler.removeCallbacks(limitCheck)
         dismissOverlay()
         foregroundPackage = null
         if (instance === this) instance = null
         Log.i(TAG, "destroyed")
         super.onDestroy()
+    }
+
+    private fun updateEventPackageFilter() {
+        val info = serviceInfo ?: return
+        recoveryPackages = AppCatalog.protectedPackages(this)
+        settingsPackages = AppCatalog.settingsPackages(this)
+        info.packageNames = packagesToObserve(
+            Blocked.restrictedApps(prefs),
+            recoveryPackages,
+            BROWSERS
+        ).toTypedArray()
+        setServiceInfo(info)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -55,7 +82,7 @@ class GuardrailAccessibilityService : AccessibilityService() {
         }
         Blocked.checkClockTamper(prefs)
         val pkg = event.packageName?.toString() ?: return
-        if (pkg in SETTINGS_PKGS && eventMentionsThisApp(event)) {
+        if (pkg in settingsPackages && eventMentionsThisApp(event)) {
             // The user opened our App Info page to Force Stop / disable the fence.
             Log.w(TAG, "settings opened on guardrail \u2014 kicking home")
             performGlobalAction(GLOBAL_ACTION_HOME)
@@ -88,17 +115,27 @@ class GuardrailAccessibilityService : AccessibilityService() {
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             foregroundPackage = pkg
             limitHandler.removeCallbacks(limitCheck)
-            if (pkg in Blocked.blockedApps) {
+            if (shouldGatePackage(
+                    pkg,
+                    Blocked.restrictedApps(prefs),
+                    Blocked.isLockdown(prefs),
+                    recoveryPackages
+                )
+            ) {
                 limitHandler.postDelayed(limitCheck, LIMIT_RECHECK_MS)
             }
         } else if (pkg != foregroundPackage) return
 
-        if (pkg !in Blocked.blockedApps || bypassed(pkg)) {
-            dismissOverlay()
-            return
-        }
         val reason = blockReason(pkg)
-        if (reason == null) {
+        if (reason == null ||
+            !shouldGatePackage(
+                pkg,
+                Blocked.restrictedApps(prefs),
+                reason == REASON_LOCKDOWN,
+                recoveryPackages
+            ) ||
+            bypassed(pkg)
+        ) {
             dismissOverlay()
             return
         }
@@ -245,9 +282,6 @@ class GuardrailAccessibilityService : AccessibilityService() {
         private const val LIMIT_RECHECK_MS = 5_000L
         private const val INCOGNITO_HOME_GRACE_MS = 1_500L
         private val BROWSERS = setOf("com.android.chrome")
-        private val SETTINGS_PKGS = setOf(
-            "com.android.settings"
-        )
         @Volatile
         var instance: GuardrailAccessibilityService? = null
             private set
